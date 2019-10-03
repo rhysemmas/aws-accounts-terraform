@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-DEFAULT_REGION='us-east-1'
+DEFAULT_REGION='eu-west-2'
 
 function usage {
     echo "DESCRIPTION:"
@@ -90,7 +90,7 @@ else
     terragrunt init --terragrunt-config terraform-local.tfvars
     terragrunt apply --terragrunt-config terraform-local.tfvars
     INFOSEC_AWS_ACCT=$(terraform output infosec_acct_id)
-    
+
     echo "=== COPYING LOCAL STATE TO S3 ==="
     rm ./backend_local_override.tf || true
     sleep 10 # give AWS some time for the IAM policy to take effect
@@ -104,10 +104,11 @@ popd
 echo "=== CREATING temp-admin USER ==="
 pushd ./temp-admin
 export "TG_AWS_ACCT=${INFOSEC_AWS_ACCT}"
-terragrunt apply -var infosec_acct_id=${INFOSEC_AWS_ACCT} -var keybase=${KEYBASE_PROFILE}
+terragrunt apply -var infosec_acct_id=${INFOSEC_AWS_ACCT} -var key=${KEYBASE_PROFILE}
 unset "TG_AWS_ACCT"
+export "GPG_TTY=$(tty)"
 ADMIN_ACCESS_KEY=$(terraform output temp_admin_access_key)
-ADMIN_SECRET_KEY=$(terraform output temp_admin_secret_key | base64 --decode | keybase pgp decrypt)
+ADMIN_SECRET_KEY=$(terraform output temp_admin_secret_key | base64 --decode | gpg -d )
 popd
 sleep 10 # give AWS some time for the new access key to be ready
 
@@ -132,7 +133,7 @@ popd
 if [[ -n "${LOGIN_USER}" ]]; then
     echo "=== GENERATING TEMP PASSWORD FOR ${LOGIN_USER} ==="
     pushd ../utility/one-time-login
-    terragrunt apply -var user_name=${LOGIN_USER} -var infosec_acct_id=${INFOSEC_AWS_ACCT} -var keybase=${KEYBASE_PROFILE}
+    terragrunt apply -var user_name=${LOGIN_USER} -var infosec_acct_id=${INFOSEC_AWS_ACCT} -var key=${KEYBASE_PROFILE}
     ENCRYPTED_PASS=$(terraform output temp_password)
     terraform taint aws_iam_user_login_profile.login
     popd
@@ -142,14 +143,14 @@ echo "=== DELETING temp-admin USER ==="
 pushd ./temp-admin
 export_master_keys
 export "TG_AWS_ACCT=${INFOSEC_AWS_ACCT}"
-terragrunt destroy -var infosec_acct_id=${INFOSEC_AWS_ACCT} -var keybase=${KEYBASE_PROFILE}
+terragrunt destroy -var infosec_acct_id=${INFOSEC_AWS_ACCT} -var key=${KEYBASE_PROFILE}
 unset "TG_AWS_ACCT"
 popd
 
 echo "=== INITIALIZATION COMPLETE ==="
 
 if [[ -n "${LOGIN_USER}" ]]; then
-    echo "One-time password for ${LOGIN_USER}: $(echo ${ENCRYPTED_PASS} | base64 --decode | keybase pgp decrypt)"
+    echo "One-time password for ${LOGIN_USER}: $(echo ${ENCRYPTED_PASS} | base64 --decode | gpg -d )"
 fi
 
 echo "Login URL: https://${INFOSEC_ALIAS}.signin.aws.amazon.com/console"
