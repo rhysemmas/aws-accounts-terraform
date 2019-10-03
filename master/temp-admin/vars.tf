@@ -1,5 +1,5 @@
 variable "key" {
-  description = "Enter the pgp key to encrypt the secret_key (to decrypt: terraform output secret_key | base64 --decode | pgp -d)"
+  description = "Enter the pgp key to encrypt the secret_key (to decrypt: terraform output secret_key | base64 --decode | gpg -d)"
 }
 
 variable "infosec_acct_id" {}

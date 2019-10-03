@@ -12,5 +12,5 @@ provider "aws" {
 
 resource "aws_iam_user_login_profile" "login" {
   user    = "${var.user_name}"
-  pgp_key = "keybase:${var.keybase}"
+  pgp_key = "keybase:${var.key}"
 }
