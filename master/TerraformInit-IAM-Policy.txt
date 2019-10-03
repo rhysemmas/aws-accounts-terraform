@@ -21,6 +21,19 @@
             ]
         },
         {
+            "Sid": "IamTooMuchAccess",
+            "Effect": "Allow",
+            "Action": [
+                "iam:*"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:role/*Terragrunt*",
+                "arn:aws:iam::*:role/*Administrator*",
+                "arn:aws:iam::*:policy/*Administrator*",
+                "arn:aws:iam::*:policy/MasterBillingRoleAccess"
+            ]
+        },
+        {
             "Sid": "AllowAliasAdmin",
             "Effect": "Allow",
             "Action": [
