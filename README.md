@@ -1,3 +1,16 @@
+`Notes`
+
+This is my butchered version, it probably won't work for you
+
+!!!!!!!!!!!!!!
+TF v0.11.9
+TG v0.17.0
+!!!!!!!!!!!!!!
+
+[init.sh](./master/init.sh) - I have modified the init script to decrypt the IAM user secret using gpg (rather than keybase) as I did not want to add my private PGP key to keybase's keyring
+[organization/main.tf](./master/organization/main.tf) - comment out lines 8-10 if SSO is NOT enabled for your org (it wont be on first run through)
+[organization/main.tf](./master/organization/main.tf) - line 49: messed up the account alias for my master account so added a '2' to create a new alias. You may wish to remove this random '2' yourself.
+
 # AWS Organization Terraform
 
 This repository contains the Terraform configurations needed to manage a multi-account AWS organization and the various roles that will be used within the accounts.

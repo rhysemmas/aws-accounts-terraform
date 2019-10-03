@@ -6,3 +6,9 @@
 # OS X
 .history
 .DS_Store
+
+# Keys
+*.key
+
+# Specific vars
+*.tfvars
