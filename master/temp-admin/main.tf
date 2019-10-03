@@ -81,6 +81,6 @@ resource "aws_iam_user_policy_attachment" "assume_role_terragrunt_reader" {
 
 resource "aws_iam_access_key" "temp_admin" {
   user     = "${aws_iam_user.temp_admin.name}"
-  pgp_key  = "keybase:${var.keybase}"
+  pgp_key  = "keybase:${var.key}"
   provider = "aws.assume_infosec"
 }
