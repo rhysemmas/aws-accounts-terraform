@@ -5,6 +5,9 @@ terraform {
 data "aws_caller_identity" "current" {}
 
 resource "aws_organizations_organization" "org" {
+  aws_service_access_principals = [
+    "sso.amazonaws.com"
+  ]
   feature_set = "ALL"
 
   lifecycle {
@@ -43,7 +46,7 @@ resource "aws_organizations_account" "non_prod" {
 }
 
 resource "aws_iam_account_alias" "alias" {
-  account_alias = "${var.org_name}-master"
+  account_alias = "${var.org_name}-2-master"
 }
 
 provider "aws" {
